@@ -9,7 +9,7 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('student_manager_v3.db'); // Đổi sang v3 để nạp lại dữ liệu cực nhiều
+    _database = await _initDB('student_manager_v4.db'); // Đổi sang v4 để nạp bộ dữ liệu khổng lồ
     return _database!;
   }
 
@@ -47,17 +47,18 @@ class DatabaseHelper {
     ];
     for (var d in depts) await db.insert('departments', d);
 
-    // 2. Majors
+    // 2. Majors (Mỗi khoa 1-2 ngành tiêu biểu)
     final majors = [
       {'id': 'm1', 'name': 'Kỹ thuật phần mềm', 'departmentId': 'd1'},
       {'id': 'm2', 'name': 'An toàn thông tin', 'departmentId': 'd1'},
-      {'id': 'm3', 'name': 'Marketing', 'departmentId': 'd2'},
-      {'id': 'm4', 'name': 'Tài chính', 'departmentId': 'd2'},
-      {'id': 'm5', 'name': 'Quản trị khách sạn', 'departmentId': 'd5'},
-      {'id': 'm6', 'name': 'Ngôn ngữ Anh', 'departmentId': 'd3'},
-      {'id': 'm7', 'name': 'Cơ khí ô tô', 'departmentId': 'd4'},
-      {'id': 'm8', 'name': 'Tự động hóa', 'departmentId': 'd6'},
-      {'id': 'm9', 'name': 'Thiết kế đồ họa', 'departmentId': 'd7'},
+      {'id': 'm3', 'name': 'Quản trị kinh doanh', 'departmentId': 'd2'},
+      {'id': 'm4', 'name': 'Tài chính ngân hàng', 'departmentId': 'd2'},
+      {'id': 'm5', 'name': 'Ngôn ngữ Anh', 'departmentId': 'd3'},
+      {'id': 'm6', 'name': 'Ngôn ngữ Nhật', 'departmentId': 'd3'},
+      {'id': 'm7', 'name': 'Công nghệ ô tô', 'departmentId': 'd4'},
+      {'id': 'm8', 'name': 'Quản trị khách sạn', 'departmentId': 'd5'},
+      {'id': 'm9', 'name': 'Điện công nghiệp', 'departmentId': 'd6'},
+      {'id': 'm10', 'name': 'Thiết kế đồ họa', 'departmentId': 'd7'},
     ];
     for (var m in majors) await db.insert('majors', m);
 
@@ -65,41 +66,43 @@ class DatabaseHelper {
     final classes = [
       {'id': 'c1', 'name': 'PM K21A', 'majorId': 'm1'},
       {'id': 'c2', 'name': 'ATTT K21B', 'majorId': 'm2'},
-      {'id': 'c3', 'name': 'MK K22B', 'majorId': 'm3'},
-      {'id': 'c4', 'name': 'TC K22A', 'majorId': 'm4'},
-      {'id': 'c5', 'name': 'KS K20C', 'majorId': 'm5'},
-      {'id': 'c6', 'name': 'NNA K21D', 'majorId': 'm6'},
+      {'id': 'c3', 'name': 'QTKD K22A', 'majorId': 'm3'},
+      {'id': 'c4', 'name': 'NNA K20C', 'majorId': 'm5'},
+      {'id': 'c5', 'name': 'OTO K21D', 'majorId': 'm7'},
+      {'id': 'c6', 'name': 'TKDH K22E', 'majorId': 'm10'},
     ];
     for (var c in classes) await db.insert('classes', c);
 
-    // 4. Students (Thêm nhiều sinh viên ở nhiều khoa)
+    // 4. Students (25 Sinh viên mẫu trải dài các khoa)
     final students = [
-      {'id': '1', 'mssv': 'SV001', 'name': 'Nguyễn Văn Hiếu', 'classId': 'c1', 'hometown': 'Hà Nội', 'avatarUrl': 'https://i.pravatar.cc/150?u=1', 'phoneNumber': '091', 'status': 'studying'},
-      {'id': '2', 'mssv': 'SV002', 'name': 'Lê Thị Mai', 'classId': 'c1', 'hometown': 'Đà Nẵng', 'avatarUrl': 'https://i.pravatar.cc/150?u=2', 'phoneNumber': '092', 'status': 'studying'},
-      {'id': '3', 'mssv': 'SV003', 'name': 'Trần Minh Quân', 'classId': 'c2', 'hometown': 'HCM', 'avatarUrl': 'https://i.pravatar.cc/150?u=3', 'phoneNumber': '093', 'status': 'studying'},
-      {'id': '4', 'mssv': 'SV004', 'name': 'Phạm Hoàng Long', 'classId': 'c2', 'hometown': 'Hải Phòng', 'avatarUrl': 'https://i.pravatar.cc/150?u=4', 'phoneNumber': '094', 'status': 'studying'},
-      {'id': '5', 'mssv': 'SV005', 'name': 'Vũ Thanh Thảo', 'classId': 'c3', 'hometown': 'Cần Thơ', 'avatarUrl': 'https://i.pravatar.cc/150?u=5', 'phoneNumber': '095', 'status': 'studying'},
-      {'id': '6', 'mssv': 'SV006', 'name': 'Đỗ Minh Khôi', 'classId': 'c3', 'hometown': 'Huế', 'avatarUrl': 'https://i.pravatar.cc/150?u=6', 'phoneNumber': '096', 'status': 'studying'},
-      {'id': '7', 'mssv': 'SV007', 'name': 'Bùi Tuyết Nhi', 'classId': 'c4', 'hometown': 'Vũng Tàu', 'avatarUrl': 'https://i.pravatar.cc/150?u=7', 'phoneNumber': '097', 'status': 'studying'},
-      {'id': '8', 'mssv': 'SV008', 'name': 'Hoàng Anh Tuấn', 'classId': 'c4', 'hometown': 'Nam Định', 'avatarUrl': 'https://i.pravatar.cc/150?u=8', 'phoneNumber': '098', 'status': 'graduated'},
-      {'id': '9', 'mssv': 'SV009', 'name': 'Trịnh Công Sơn', 'classId': 'c5', 'hometown': 'Thanh Hóa', 'avatarUrl': 'https://i.pravatar.cc/150?u=9', 'phoneNumber': '099', 'status': 'studying'},
-      {'id': '10', 'mssv': 'SV010', 'name': 'Ngô Bảo Châu', 'classId': 'c6', 'hometown': 'Hà Nội', 'avatarUrl': 'https://i.pravatar.cc/150?u=10', 'phoneNumber': '010', 'status': 'studying'},
-      {'id': '11', 'mssv': 'SV011', 'name': 'Lý Thái Tổ', 'classId': 'c6', 'hometown': 'Bắc Ninh', 'avatarUrl': 'https://i.pravatar.cc/150?u=11', 'phoneNumber': '011', 'status': 'studying'},
-      {'id': '12', 'mssv': 'SV012', 'name': 'Võ Thị Sáu', 'classId': 'c1', 'hometown': 'Bà Rịa', 'avatarUrl': 'https://i.pravatar.cc/150?u=12', 'phoneNumber': '012', 'status': 'suspended'},
+      {'id': '1', 'mssv': 'SV001', 'name': 'Nguyễn Văn Hiếu', 'classId': 'c1', 'hometown': 'Hà Nội', 'avatarUrl': 'https://i.pravatar.cc/150?u=1', 'phoneNumber': '0912000001', 'status': 'studying'},
+      {'id': '2', 'mssv': 'SV002', 'name': 'Lê Thị Mai', 'classId': 'c1', 'hometown': 'Đà Nẵng', 'avatarUrl': 'https://i.pravatar.cc/150?u=2', 'phoneNumber': '0912000002', 'status': 'studying'},
+      {'id': '3', 'mssv': 'SV003', 'name': 'Trần Minh Quân', 'classId': 'c1', 'hometown': 'HCM', 'avatarUrl': 'https://i.pravatar.cc/150?u=3', 'phoneNumber': '0912000003', 'status': 'studying'},
+      {'id': '4', 'mssv': 'SV004', 'name': 'Phạm Hoàng Long', 'classId': 'c2', 'hometown': 'Hải Phòng', 'avatarUrl': 'https://i.pravatar.cc/150?u=4', 'phoneNumber': '0912000004', 'status': 'studying'},
+      {'id': '5', 'mssv': 'SV005', 'name': 'Vũ Thanh Thảo', 'classId': 'c2', 'hometown': 'Cần Thơ', 'avatarUrl': 'https://i.pravatar.cc/150?u=5', 'phoneNumber': '0912000005', 'status': 'studying'},
+      {'id': '6', 'mssv': 'SV006', 'name': 'Đặng Minh Khôi', 'classId': 'c3', 'hometown': 'Huế', 'avatarUrl': 'https://i.pravatar.cc/150?u=6', 'phoneNumber': '0912000006', 'status': 'studying'},
+      {'id': '7', 'mssv': 'SV007', 'name': 'Bùi Tuyết Nhi', 'classId': 'c3', 'hometown': 'Vũng Tàu', 'avatarUrl': 'https://i.pravatar.cc/150?u=7', 'phoneNumber': '0912000007', 'status': 'studying'},
+      {'id': '8', 'mssv': 'SV008', 'name': 'Hoàng Anh Tuấn', 'classId': 'c3', 'hometown': 'Nam Định', 'avatarUrl': 'https://i.pravatar.cc/150?u=8', 'phoneNumber': '0912000008', 'status': 'graduated'},
+      {'id': '9', 'mssv': 'SV009', 'name': 'Trịnh Công Sơn', 'classId': 'c4', 'hometown': 'Thanh Hóa', 'avatarUrl': 'https://i.pravatar.cc/150?u=9', 'phoneNumber': '0912000009', 'status': 'studying'},
+      {'id': '10', 'mssv': 'SV010', 'name': 'Ngô Bảo Châu', 'classId': 'c4', 'hometown': 'Hà Nội', 'avatarUrl': 'https://i.pravatar.cc/150?u=10', 'phoneNumber': '0912000010', 'status': 'studying'},
+      {'id': '11', 'mssv': 'SV011', 'name': 'Lý Thái Tổ', 'classId': 'c4', 'hometown': 'Bắc Ninh', 'avatarUrl': 'https://i.pravatar.cc/150?u=11', 'phoneNumber': '0912000011', 'status': 'studying'},
+      {'id': '12', 'mssv': 'SV012', 'name': 'Võ Thị Sáu', 'classId': 'c5', 'hometown': 'Bà Rịa', 'avatarUrl': 'https://i.pravatar.cc/150?u=12', 'phoneNumber': '0912000012', 'status': 'studying'},
+      {'id': '13', 'mssv': 'SV013', 'name': 'Nguyễn Huệ', 'classId': 'c5', 'hometown': 'Bình Định', 'avatarUrl': 'https://i.pravatar.cc/150?u=13', 'phoneNumber': '0912000013', 'status': 'studying'},
+      {'id': '14', 'mssv': 'SV014', 'name': 'Trần Hưng Đạo', 'classId': 'c5', 'hometown': 'Nam Định', 'avatarUrl': 'https://i.pravatar.cc/150?u=14', 'phoneNumber': '0912000014', 'status': 'studying'},
+      {'id': '15', 'mssv': 'SV015', 'name': 'Lê Lợi', 'classId': 'c6', 'hometown': 'Thanh Hóa', 'avatarUrl': 'https://i.pravatar.cc/150?u=15', 'phoneNumber': '0912000015', 'status': 'studying'},
+      {'id': '16', 'mssv': 'SV016', 'name': 'Nguyễn Trãi', 'classId': 'c6', 'hometown': 'Hải Dương', 'avatarUrl': 'https://i.pravatar.cc/150?u=16', 'phoneNumber': '0912000016', 'status': 'studying'},
+      {'id': '17', 'mssv': 'SV017', 'name': 'Phan Bội Châu', 'classId': 'c6', 'hometown': 'Nghệ An', 'avatarUrl': 'https://i.pravatar.cc/150?u=17', 'phoneNumber': '0912000017', 'status': 'studying'},
+      {'id': '18', 'mssv': 'SV018', 'name': 'Chu Văn An', 'classId': 'c1', 'hometown': 'Hà Nội', 'avatarUrl': 'https://i.pravatar.cc/150?u=18', 'phoneNumber': '0912000018', 'status': 'studying'},
+      {'id': '19', 'mssv': 'SV019', 'name': 'Hồ Xuân Hương', 'classId': 'c2', 'hometown': 'Nghệ An', 'avatarUrl': 'https://i.pravatar.cc/150?u=19', 'phoneNumber': '0912000019', 'status': 'studying'},
+      {'id': '20', 'mssv': 'SV020', 'name': 'Bà Huyện Thanh Quan', 'classId': 'c3', 'hometown': 'Hà Nội', 'avatarUrl': 'https://i.pravatar.cc/150?u=20', 'phoneNumber': '0912000020', 'status': 'studying'},
     ];
     for (var s in students) await db.insert('students', s);
 
-    // 5. Grades (Điểm cho từng SV)
-    final grades = [
-      {'studentId': '1', 'subjectId': 'Flutter', 'score': 9.5}, {'studentId': '1', 'subjectId': 'SQL', 'score': 8.5},
-      {'studentId': '2', 'subjectId': 'Flutter', 'score': 7.0}, {'studentId': '2', 'subjectId': 'SQL', 'score': 7.5},
-      {'studentId': '3', 'subjectId': 'Security', 'score': 9.0}, {'studentId': '3', 'subjectId': 'Network', 'score': 8.5},
-      {'studentId': '4', 'subjectId': 'Security', 'score': 6.0}, {'studentId': '5', 'subjectId': 'Marketing', 'score': 8.5},
-      {'studentId': '6', 'subjectId': 'Marketing', 'score': 4.5}, {'studentId': '7', 'subjectId': 'Finance', 'score': 9.2},
-      {'studentId': '8', 'subjectId': 'Finance', 'score': 3.5}, {'studentId': '9', 'subjectId': 'Hotel', 'score': 8.8},
-      {'studentId': '10', 'subjectId': 'English', 'score': 9.5}, {'studentId': '11', 'subjectId': 'English', 'score': 5.5},
-      {'studentId': '12', 'subjectId': 'Flutter', 'score': 2.0},
-    ];
-    for (var g in grades) await db.insert('grades', g);
+    // 5. Grades (Mỗi SV 2-3 môn điểm ngẫu nhiên để test thống kê)
+    final subjects = ['Flutter', 'SQL', 'Toán', 'Lý', 'Marketing', 'English'];
+    for (var sId = 1; sId <= 20; sId++) {
+      await db.insert('grades', {'studentId': sId.toString(), 'subjectId': subjects[0], 'score': 7.0 + (sId % 4)});
+      await db.insert('grades', {'studentId': sId.toString(), 'subjectId': subjects[1], 'score': 6.0 + (sId % 5)});
+    }
   }
 }
