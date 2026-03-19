@@ -1,6 +1,6 @@
 import 'academic_models.dart';
 
-enum StudentStatus { studying, graduated, suspended }
+enum StudentStatus { pending, studying, graduated, suspended, deleted }
 
 class Student {
   final String id;
@@ -40,17 +40,47 @@ class Student {
       phoneNumber: map['phoneNumber'],
       email: map['email'] ?? '',
       birthday: map['birthday'] ?? '01/01/2000',
-      status: StudentStatus.values.firstWhere(
-        (e) => e.toString() == 'StudentStatus.${map['status']}',
-        orElse: () => StudentStatus.studying,
-      ),
+      status: (() {
+        final s = map['status']?.toString() ?? '';
+        switch (s) {
+          case 'pending':
+            return StudentStatus.pending;
+          case 'studying':
+            return StudentStatus.studying;
+          case 'graduated':
+            return StudentStatus.graduated;
+          case 'suspended':
+            return StudentStatus.suspended;
+          case 'deleted':
+            return StudentStatus.deleted;
+          default:
+            return StudentStatus.studying;
+        }
+      }()),
       grades: grades,
     );
   }
 
+  Map<String, dynamic> toMap() {
+    // Map fields that match the database schema
+    return {
+      'id': id,
+      'mssv': mssv,
+      'name': name,
+      'classId': classId,
+      'hometown': hometown,
+      'avatarUrl': avatarUrl,
+      'phoneNumber': phoneNumber,
+      'status': status.toString().split('.').last,
+    };
+  }
+
   double get gpa10 {
     if (grades.isEmpty) return 0.0;
-    double totalWeightedScore = grades.fold(0, (sum, item) => sum + (item.score * item.credits));
+    double totalWeightedScore = grades.fold(
+      0,
+      (sum, item) => sum + (item.score * item.credits),
+    );
     int totalCredits = grades.fold(0, (sum, item) => sum + item.credits);
     if (totalCredits == 0) return 0.0;
     return double.parse((totalWeightedScore / totalCredits).toStringAsFixed(2));

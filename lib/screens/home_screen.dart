@@ -6,6 +6,7 @@ import '../providers/student_provider.dart';
 import '../models/student.dart';
 import 'student_detail_screen.dart';
 import 'add_student_screen.dart';
+import 'filter_history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -22,7 +23,13 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   CircularProgressIndicator(),
                   SizedBox(height: 16),
-                  Text("Đang tải dữ liệu học viện...", style: TextStyle(color: Colors.indigo, fontWeight: FontWeight.bold)),
+                  Text(
+                    "Đang tải dữ liệu học viện...",
+                    style: TextStyle(
+                      color: Colors.indigo,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -36,8 +43,18 @@ class HomeScreen extends StatelessWidget {
             title: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Thực hành 5 - G13', style: TextStyle(fontSize: 12, color: Colors.white70)),
-                Text('Student Manager', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+                Text(
+                  'Thực hành 5 - G13',
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
+                ),
+                Text(
+                  'Student Manager',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                ),
               ],
             ),
             flexibleSpace: Container(
@@ -50,7 +67,21 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             actions: [
-              IconButton(icon: const Icon(Icons.refresh, color: Colors.white), onPressed: () => provider.refreshStudents()),
+              IconButton(
+                icon: const Icon(Icons.filter_list, color: Colors.white),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const FilterHistoryScreen(),
+                    ),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.white),
+                onPressed: () => provider.refreshStudents(),
+              ),
             ],
           ),
           body: Column(
@@ -60,11 +91,23 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    _buildQuickStat('Tổng số', provider.totalStudents.toString(), Colors.blue),
+                    _buildQuickStat(
+                      'Tổng số',
+                      provider.totalStudents.toString(),
+                      Colors.blue,
+                    ),
                     const SizedBox(width: 8),
-                    _buildQuickStat('Xuất sắc', provider.excellentStudents.toString(), Colors.orange),
+                    _buildQuickStat(
+                      'Xuất sắc',
+                      provider.excellentStudents.toString(),
+                      Colors.orange,
+                    ),
                     const SizedBox(width: 8),
-                    _buildQuickStat('Yếu/Kém', provider.warningStudents.toString(), Colors.red),
+                    _buildQuickStat(
+                      'Yếu/Kém',
+                      provider.warningStudents.toString(),
+                      Colors.red,
+                    ),
                   ],
                 ),
               ),
@@ -76,7 +119,12 @@ class HomeScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                      ),
+                    ],
                   ),
                   child: TextField(
                     onChanged: (v) => provider.setSearchQuery(v),
@@ -101,23 +149,32 @@ class HomeScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final isAll = index == 0;
                     final dept = isAll ? null : provider.departments[index - 1];
-                    final isSelected = isAll ? provider.selectedDepartmentId == null : provider.selectedDepartmentId == dept?.id;
+                    final isSelected = isAll
+                        ? provider.selectedDepartmentId == null
+                        : provider.selectedDepartmentId == dept?.id;
 
                     return GestureDetector(
-                      onTap: () => provider.selectDepartment(isAll ? null : dept?.id),
+                      onTap: () =>
+                          provider.selectDepartment(isAll ? null : dept?.id),
                       child: Container(
                         width: 75,
                         margin: const EdgeInsets.only(right: 10),
                         decoration: BoxDecoration(
                           color: isSelected ? Colors.indigo : Colors.white,
                           borderRadius: BorderRadius.circular(15),
-                          border: Border.all(color: isSelected ? Colors.indigo : Colors.grey.shade200),
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.indigo
+                                : Colors.grey.shade200,
+                          ),
                         ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             FaIcon(
-                              isAll ? FontAwesomeIcons.borderAll : _getIconData(dept!.icon),
+                              isAll
+                                  ? FontAwesomeIcons.borderAll
+                                  : _getIconData(dept!.icon),
                               size: 18,
                               color: isSelected ? Colors.white : Colors.indigo,
                             ),
@@ -125,7 +182,13 @@ class HomeScreen extends StatelessWidget {
                             Text(
                               isAll ? 'Tất cả' : dept!.name,
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black87),
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.black87,
+                              ),
                             ),
                           ],
                         ),
@@ -138,14 +201,18 @@ class HomeScreen extends StatelessWidget {
               // 4. Student List
               Expanded(
                 child: provider.students.isEmpty
-                  ? const Center(child: Text("Không có sinh viên nào"))
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: provider.students.length,
-                      itemBuilder: (context, index) {
-                        return _buildModernStudentCard(context, provider.students[index], provider);
-                      },
-                    ),
+                    ? const Center(child: Text("Không có sinh viên nào"))
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: provider.students.length,
+                        itemBuilder: (context, index) {
+                          return _buildModernStudentCard(
+                            context,
+                            provider.students[index],
+                            provider,
+                          );
+                        },
+                      ),
               ),
             ],
           ),
@@ -153,7 +220,9 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const AddStudentScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const AddStudentScreen(),
+                ),
               );
             },
             label: const Text('Thêm SV', style: TextStyle(color: Colors.white)),
@@ -169,18 +238,35 @@ class HomeScreen extends StatelessWidget {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Column(
           children: [
-            Text(label, style: const TextStyle(fontSize: 9, color: Colors.grey)),
-            Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 9, color: Colors.grey),
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildModernStudentCard(BuildContext context, Student student, StudentProvider provider) {
+  Widget _buildModernStudentCard(
+    BuildContext context,
+    Student student,
+    StudentProvider provider,
+  ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
@@ -201,7 +287,9 @@ class HomeScreen extends StatelessWidget {
                 tag: 'avatar-${student.id}',
                 child: CircleAvatar(
                   radius: 25,
-                  backgroundImage: CachedNetworkImageProvider(student.avatarUrl),
+                  backgroundImage: CachedNetworkImageProvider(
+                    student.avatarUrl,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -209,17 +297,43 @@ class HomeScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                    Text('MSSV: ${student.mssv}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                    Text(provider.getMajorName(student.classId), style: const TextStyle(fontSize: 11, color: Colors.indigo, fontWeight: FontWeight.bold)),
+                    Text(
+                      student.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      'MSSV: ${student.mssv}',
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                    Text(
+                      provider.getMajorName(student.classId),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Colors.indigo,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(student.gpa4.toString(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
-                  Text(student.classification, style: const TextStyle(fontSize: 8, color: Colors.grey)),
+                  Text(
+                    student.gpa4.toString(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  Text(
+                    student.classification,
+                    style: const TextStyle(fontSize: 8, color: Colors.grey),
+                  ),
                 ],
               ),
             ],
@@ -231,14 +345,22 @@ class HomeScreen extends StatelessWidget {
 
   IconData _getIconData(String iconName) {
     switch (iconName) {
-      case 'laptop': return FontAwesomeIcons.laptop;
-      case 'chart-line': return FontAwesomeIcons.chartLine;
-      case 'language': return FontAwesomeIcons.language;
-      case 'car': return FontAwesomeIcons.car;
-      case 'hotel': return FontAwesomeIcons.hotel;
-      case 'bolt': return FontAwesomeIcons.bolt;
-      case 'palette': return FontAwesomeIcons.palette;
-      default: return FontAwesomeIcons.graduationCap;
+      case 'laptop':
+        return FontAwesomeIcons.laptop;
+      case 'chart-line':
+        return FontAwesomeIcons.chartLine;
+      case 'language':
+        return FontAwesomeIcons.language;
+      case 'car':
+        return FontAwesomeIcons.car;
+      case 'hotel':
+        return FontAwesomeIcons.hotel;
+      case 'bolt':
+        return FontAwesomeIcons.bolt;
+      case 'palette':
+        return FontAwesomeIcons.palette;
+      default:
+        return FontAwesomeIcons.graduationCap;
     }
   }
 }

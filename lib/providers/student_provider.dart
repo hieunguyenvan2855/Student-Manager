@@ -29,7 +29,7 @@ class StudentProvider with ChangeNotifier {
     } else {
       try {
         final db = await DatabaseHelper.instance.database;
-        
+
         final deptMaps = await db.query('departments');
         _departments = deptMaps.map((m) => Department.fromMap(m)).toList();
 
@@ -42,12 +42,16 @@ class StudentProvider with ChangeNotifier {
         final studentMaps = await db.query('students');
         List<Student> loadedStudents = [];
         for (var sMap in studentMaps) {
-          final gradeMaps = await db.query('grades', where: 'studentId = ?', whereArgs: [sMap['id']]);
+          final gradeMaps = await db.query(
+            'grades',
+            where: 'studentId = ?',
+            whereArgs: [sMap['id']],
+          );
           final grades = gradeMaps.map((g) => Grade.fromMap(g)).toList();
           loadedStudents.add(Student.fromMap(sMap, grades));
         }
         _students = loadedStudents;
-        
+
         if (_students.isEmpty) _loadMockData();
       } catch (e) {
         _loadMockData();
@@ -79,39 +83,39 @@ class StudentProvider with ChangeNotifier {
 
     _students = [
       Student(
-        id: '1', 
-        mssv: 'SV001', 
-        name: 'Nguyễn Văn Hiếu', 
-        classId: 'c1', 
-        hometown: 'Hà Nội', 
+        id: '1',
+        mssv: 'SV001',
+        name: 'Nguyễn Văn Hiếu',
+        classId: 'c1',
+        hometown: 'Hà Nội',
         birthday: '15/05/2003',
         email: 'hieu.nv@gmail.com',
-        avatarUrl: 'https://i.pravatar.cc/150?u=1', 
-        phoneNumber: '0912345678', 
-        status: StudentStatus.studying, 
+        avatarUrl: 'https://i.pravatar.cc/150?u=1',
+        phoneNumber: '0912345678',
+        status: StudentStatus.studying,
         grades: [
           Grade(subjectId: 'Flutter', score: 9.5, credits: 3),
           Grade(subjectId: 'Java', score: 8.0, credits: 4),
           Grade(subjectId: 'SQL', score: 8.5, credits: 2),
           Grade(subjectId: 'Web', score: 7.0, credits: 3),
-        ]
+        ],
       ),
       Student(
-        id: '2', 
-        mssv: 'SV002', 
-        name: 'Lê Thị Mai', 
-        classId: 'c1', 
-        hometown: 'Đà Nẵng', 
+        id: '2',
+        mssv: 'SV002',
+        name: 'Lê Thị Mai',
+        classId: 'c1',
+        hometown: 'Đà Nẵng',
         birthday: '20/10/2003',
         email: 'mai.lt@gmail.com',
-        avatarUrl: 'https://i.pravatar.cc/150?u=2', 
-        phoneNumber: '0923456789', 
-        status: StudentStatus.studying, 
+        avatarUrl: 'https://i.pravatar.cc/150?u=2',
+        phoneNumber: '0923456789',
+        status: StudentStatus.studying,
         grades: [
           Grade(subjectId: 'Flutter', score: 8.0, credits: 3),
           Grade(subjectId: 'Java', score: 9.0, credits: 4),
           Grade(subjectId: 'SQL', score: 7.5, credits: 2),
-        ]
+        ],
       ),
     ];
   }
@@ -120,13 +124,39 @@ class StudentProvider with ChangeNotifier {
     final index = _students.indexWhere((s) => s.id == updatedStudent.id);
     if (index != -1) {
       _students[index] = updatedStudent;
+      // persist
+      _saveStudentToDb(updatedStudent);
       notifyListeners();
     }
   }
 
-  void addStudent(Student student) {
+  Future<void> addStudent(Student student) async {
     _students.add(student);
+    await _saveStudentToDb(student);
     notifyListeners();
+  }
+
+  Future<void> deleteStudent(String id) async {
+    final index = _students.indexWhere((s) => s.id == id);
+    if (index != -1) {
+      final s = _students[index];
+      final deleted = Student(
+        id: s.id,
+        mssv: s.mssv,
+        name: s.name,
+        classId: s.classId,
+        hometown: s.hometown,
+        avatarUrl: s.avatarUrl,
+        phoneNumber: s.phoneNumber,
+        email: s.email,
+        birthday: s.birthday,
+        grades: s.grades,
+        status: StudentStatus.deleted,
+      );
+      _students[index] = deleted;
+      await _saveStudentToDb(deleted);
+      notifyListeners();
+    }
   }
 
   List<Department> get departments => _departments;
@@ -138,10 +168,39 @@ class StudentProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _saveStudentToDb(Student student) async {
+    if (kIsWeb) return;
+    try {
+      final db = await DatabaseHelper.instance.database;
+      // try update first
+      final existing = await db.query(
+        'students',
+        where: 'id = ?',
+        whereArgs: [student.id],
+      );
+      if (existing.isNotEmpty) {
+        await db.update(
+          'students',
+          student.toMap(),
+          where: 'id = ?',
+          whereArgs: [student.id],
+        );
+      } else {
+        await db.insert('students', student.toMap());
+      }
+    } catch (e) {
+      // ignore persistence errors and keep in-memory
+    }
+  }
+
   List<Student> get students {
     Iterable<Student> filtered = _students;
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((s) => s.name.toLowerCase().contains(_searchQuery.toLowerCase()) || s.mssv.contains(_searchQuery));
+      filtered = filtered.where(
+        (s) =>
+            s.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            s.mssv.contains(_searchQuery),
+      );
     }
     if (_selectedDepartmentId != null) {
       filtered = filtered.where((s) {
@@ -149,7 +208,9 @@ class StudentProvider with ChangeNotifier {
           final classInfo = _classes.firstWhere((c) => c.id == s.classId);
           final major = _majors.firstWhere((m) => m.id == classInfo.majorId);
           return major.departmentId == _selectedDepartmentId;
-        } catch (e) { return false; }
+        } catch (e) {
+          return false;
+        }
       });
     }
     return filtered.toList();
@@ -164,7 +225,9 @@ class StudentProvider with ChangeNotifier {
     try {
       final classInfo = _classes.firstWhere((c) => c.id == classId);
       return _majors.firstWhere((m) => m.id == classInfo.majorId).name;
-    } catch (e) { return 'Unknown'; }
+    } catch (e) {
+      return 'Unknown';
+    }
   }
 
   String getDepartmentName(String classId) {
@@ -172,11 +235,17 @@ class StudentProvider with ChangeNotifier {
       final classInfo = _classes.firstWhere((c) => c.id == classId);
       final major = _majors.firstWhere((m) => m.id == classInfo.majorId);
       return _departments.firstWhere((d) => d.id == major.departmentId).name;
-    } catch (e) { return 'Unknown'; }
+    } catch (e) {
+      return 'Unknown';
+    }
   }
 
   String getClassName(String classId) {
-    try { return _classes.firstWhere((c) => c.id == classId).name; } catch (e) { return 'Unknown'; }
+    try {
+      return _classes.firstWhere((c) => c.id == classId).name;
+    } catch (e) {
+      return 'Unknown';
+    }
   }
 
   int get totalStudents => _students.length;
