@@ -62,7 +62,6 @@ class Student {
   }
 
   Map<String, dynamic> toMap() {
-    // Map fields that match the database schema
     return {
       'id': id,
       'mssv': mssv,
@@ -71,6 +70,8 @@ class Student {
       'hometown': hometown,
       'avatarUrl': avatarUrl,
       'phoneNumber': phoneNumber,
+      'email': email,
+      'birthday': birthday,
       'status': status.toString().split('.').last,
     };
   }
@@ -115,6 +116,7 @@ class Student {
     String? hometown,
     String? birthday,
     List<Grade>? grades,
+    StudentStatus? status,
   }) {
     return Student(
       id: id,
@@ -127,7 +129,7 @@ class Student {
       email: email ?? this.email,
       birthday: birthday ?? this.birthday,
       grades: grades ?? this.grades,
-      status: status,
+      status: status ?? this.status,
     );
   }
 }

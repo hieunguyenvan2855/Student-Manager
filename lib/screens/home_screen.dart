@@ -198,21 +198,29 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              // 4. Student List
+              // 4. Student List (With Pull to Refresh)
               Expanded(
-                child: provider.students.isEmpty
-                    ? const Center(child: Text("Không có sinh viên nào"))
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: provider.students.length,
-                        itemBuilder: (context, index) {
-                          return _buildModernStudentCard(
-                            context,
-                            provider.students[index],
-                            provider,
-                          );
-                        },
-                      ),
+                child: RefreshIndicator(
+                  onRefresh: () => provider.refreshStudents(),
+                  child: provider.students.isEmpty
+                      ? ListView(
+                          children: const [
+                            SizedBox(height: 100),
+                            Center(child: Text("Không có sinh viên nào")),
+                          ],
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: provider.students.length,
+                          itemBuilder: (context, index) {
+                            return _buildModernStudentCard(
+                              context,
+                              provider.students[index],
+                              provider,
+                            );
+                          },
+                        ),
+                ),
               ),
             ],
           ),

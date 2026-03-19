@@ -66,16 +66,21 @@ class StudentDetailScreen extends StatelessWidget {
                 _buildChartCard(currentStudent),
                 const SizedBox(height: 24),
 
-                // 5. Action Buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildActionButton(context, Icons.call, 'Gọi điện', Colors.green, () {}),
-                    _buildActionButton(context, Icons.message, 'Nhắn tin', Colors.blue, () {}),
-                    _buildActionButton(context, Icons.edit, 'Chỉnh sửa', Colors.orange, () {
-                      _showEditBottomSheet(context, currentStudent, provider);
-                    }),
-                  ],
+                // 5. Action Buttons (Chỉ giữ lại nút Chỉnh sửa)
+                Center(
+                  child: SizedBox(
+                    width: 200,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () => _showEditBottomSheet(context, currentStudent, provider),
+                      icon: const Icon(Icons.edit, color: Colors.white),
+                      label: const Text('Chỉnh sửa hồ sơ', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 30),
               ],
@@ -255,10 +260,8 @@ class StudentDetailScreen extends StatelessWidget {
     );
   }
 
-  // Helper widgets... (copy from previous version or keep as is)
   Widget _buildSectionTitle(String title) => Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.indigo));
   Widget _buildInfoCard(List<Widget> children) => Container(padding: const EdgeInsets.all(16), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade100)), child: Column(children: children));
   Widget _buildInfoRow(IconData icon, String label, String value) => Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Row(children: [Icon(icon, size: 18, color: Colors.indigo), const SizedBox(width: 15), Text(label, style: const TextStyle(color: Colors.grey)), const Spacer(), Text(value, style: const TextStyle(fontWeight: FontWeight.bold))]));
-  Widget _buildActionButton(BuildContext context, IconData icon, String label, Color color, VoidCallback onTap) => InkWell(onTap: onTap, child: Column(children: [Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle), child: Icon(icon, color: color)), const SizedBox(height: 4), Text(label, style: const TextStyle(fontSize: 12))]));
   Widget _buildTag(String text) => Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4), decoration: BoxDecoration(color: Colors.indigo.withOpacity(0.1), borderRadius: BorderRadius.circular(20)), child: Text(text, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.indigo)));
 }
