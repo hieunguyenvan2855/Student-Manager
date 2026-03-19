@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // Để nhận diện chạy trên Web hay Mobile
+import 'package:flutter/foundation.dart'
+    show kIsWeb; // Để nhận diện chạy trên Web hay Mobile
 import '../models/student.dart';
 import '../models/academic_models.dart';
 import '../database/database_helper.dart';
@@ -31,7 +32,7 @@ class StudentProvider with ChangeNotifier {
       // CHẾ ĐỘ ĐIỆN THOẠI: Dùng SQLite
       try {
         final db = await DatabaseHelper.instance.database;
-        
+
         final deptMaps = await db.query('departments');
         _departments = deptMaps.map((m) => Department.fromMap(m)).toList();
 
@@ -44,7 +45,11 @@ class StudentProvider with ChangeNotifier {
         final studentMaps = await db.query('students');
         List<Student> loadedStudents = [];
         for (var sMap in studentMaps) {
-          final gradeMaps = await db.query('grades', where: 'studentId = ?', whereArgs: [sMap['id']]);
+          final gradeMaps = await db.query(
+            'grades',
+            where: 'studentId = ?',
+            whereArgs: [sMap['id']],
+          );
           final grades = gradeMaps.map((g) => Grade.fromMap(g)).toList();
           loadedStudents.add(Student.fromMap(sMap, grades));
         }
@@ -85,12 +90,264 @@ class StudentProvider with ChangeNotifier {
     ];
 
     _students = [
-      Student(id: '1', mssv: 'SV001', name: 'Nguyễn Văn Hiếu', classId: 'c1', hometown: 'Hà Nội', avatarUrl: 'https://i.pravatar.cc/150?u=1', phoneNumber: '091', status: StudentStatus.studying, grades: [Grade(subjectId: 'Flutter', score: 9.5)]),
-      Student(id: '2', mssv: 'SV002', name: 'Lê Thị Mai', classId: 'c1', hometown: 'Đà Nẵng', avatarUrl: 'https://i.pravatar.cc/150?u=2', phoneNumber: '092', status: StudentStatus.studying, grades: [Grade(subjectId: 'Flutter', score: 8.0)]),
-      Student(id: '3', mssv: 'SV003', name: 'Trần Minh Quân', classId: 'c2', hometown: 'HCM', avatarUrl: 'https://i.pravatar.cc/150?u=3', phoneNumber: '093', status: StudentStatus.studying, grades: [Grade(subjectId: 'Marketing', score: 9.0)]),
-      Student(id: '4', mssv: 'SV004', name: 'Phạm Hoàng Long', classId: 'c2', hometown: 'Hải Phòng', avatarUrl: 'https://i.pravatar.cc/150?u=4', phoneNumber: '094', status: StudentStatus.studying, grades: [Grade(subjectId: 'Marketing', score: 7.5)]),
-      Student(id: '5', mssv: 'SV005', name: 'Vũ Thanh Thảo', classId: 'c3', hometown: 'Cần Thơ', avatarUrl: 'https://i.pravatar.cc/150?u=5', phoneNumber: '095', status: StudentStatus.studying, grades: [Grade(subjectId: 'English', score: 8.5)]),
-      // Thêm tiếp cho đủ 20 SV...
+      Student(
+        id: '1',
+        mssv: 'SV001',
+        name: 'Nguyễn Văn Hiếu',
+        classId: 'c1',
+        hometown: 'Hà Nội',
+        avatarUrl: 'https://i.pravatar.cc/150?u=1',
+        phoneNumber: '091',
+        status: StudentStatus.studying,
+        grades: [
+          // Kì 1
+          Grade(
+            subjectId: 'flutter',
+            subjectName: 'Flutter',
+            score: 9.5,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'dart',
+            subjectName: 'Dart Basics',
+            score: 9.0,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'ui',
+            subjectName: 'UI/UX Design',
+            score: 8.5,
+            credits: 2,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'database',
+            subjectName: 'Database',
+            score: 8.8,
+            credits: 4,
+            semester: '1',
+          ),
+          // Kì 2
+          Grade(
+            subjectId: 'flutter_adv',
+            subjectName: 'Advanced Flutter',
+            score: 9.2,
+            credits: 4,
+            semester: '2',
+          ),
+          Grade(
+            subjectId: 'api',
+            subjectName: 'API Development',
+            score: 8.9,
+            credits: 3,
+            semester: '2',
+          ),
+          Grade(
+            subjectId: 'testing',
+            subjectName: 'Testing',
+            score: 8.0,
+            credits: 3,
+            semester: '2',
+          ),
+        ],
+      ),
+      Student(
+        id: '2',
+        mssv: 'SV002',
+        name: 'Lê Thị Mai',
+        classId: 'c1',
+        hometown: 'Đà Nẵng',
+        avatarUrl: 'https://i.pravatar.cc/150?u=2',
+        phoneNumber: '092',
+        status: StudentStatus.studying,
+        grades: [
+          Grade(
+            subjectId: 'flutter',
+            subjectName: 'Flutter',
+            score: 8.0,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'dart',
+            subjectName: 'Dart Basics',
+            score: 7.8,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'ui',
+            subjectName: 'UI/UX Design',
+            score: 8.2,
+            credits: 2,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'database',
+            subjectName: 'Database',
+            score: 7.5,
+            credits: 4,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'flutter_adv',
+            subjectName: 'Advanced Flutter',
+            score: 8.1,
+            credits: 4,
+            semester: '2',
+          ),
+          Grade(
+            subjectId: 'api',
+            subjectName: 'API Development',
+            score: 7.9,
+            credits: 3,
+            semester: '2',
+          ),
+        ],
+      ),
+      Student(
+        id: '3',
+        mssv: 'SV003',
+        name: 'Trần Minh Quân',
+        classId: 'c2',
+        hometown: 'HCM',
+        avatarUrl: 'https://i.pravatar.cc/150?u=3',
+        phoneNumber: '093',
+        status: StudentStatus.studying,
+        grades: [
+          Grade(
+            subjectId: 'marketing',
+            subjectName: 'Marketing',
+            score: 9.0,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'business',
+            subjectName: 'Business',
+            score: 8.8,
+            credits: 4,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'communication',
+            subjectName: 'Communication',
+            score: 9.2,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'marketing_adv',
+            subjectName: 'Advanced Marketing',
+            score: 9.1,
+            credits: 4,
+            semester: '2',
+          ),
+          Grade(
+            subjectId: 'analytics',
+            subjectName: 'Analytics',
+            score: 8.5,
+            credits: 3,
+            semester: '2',
+          ),
+        ],
+      ),
+      Student(
+        id: '4',
+        mssv: 'SV004',
+        name: 'Phạm Hoàng Long',
+        classId: 'c2',
+        hometown: 'Hải Phòng',
+        avatarUrl: 'https://i.pravatar.cc/150?u=4',
+        phoneNumber: '094',
+        status: StudentStatus.studying,
+        grades: [
+          Grade(
+            subjectId: 'marketing',
+            subjectName: 'Marketing',
+            score: 7.5,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'business',
+            subjectName: 'Business',
+            score: 7.2,
+            credits: 4,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'communication',
+            subjectName: 'Communication',
+            score: 7.8,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'marketing_adv',
+            subjectName: 'Advanced Marketing',
+            score: 7.6,
+            credits: 4,
+            semester: '2',
+          ),
+          Grade(
+            subjectId: 'analytics',
+            subjectName: 'Analytics',
+            score: 7.1,
+            credits: 3,
+            semester: '2',
+          ),
+        ],
+      ),
+      Student(
+        id: '5',
+        mssv: 'SV005',
+        name: 'Vũ Thanh Thảo',
+        classId: 'c3',
+        hometown: 'Cần Thơ',
+        avatarUrl: 'https://i.pravatar.cc/150?u=5',
+        phoneNumber: '095',
+        status: StudentStatus.studying,
+        grades: [
+          Grade(
+            subjectId: 'english',
+            subjectName: 'English',
+            score: 8.5,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'literature',
+            subjectName: 'Literature',
+            score: 8.8,
+            credits: 3,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'grammar',
+            subjectName: 'Grammar',
+            score: 8.2,
+            credits: 2,
+            semester: '1',
+          ),
+          Grade(
+            subjectId: 'english_adv',
+            subjectName: 'Advanced English',
+            score: 8.9,
+            credits: 4,
+            semester: '2',
+          ),
+          Grade(
+            subjectId: 'translation',
+            subjectName: 'Translation',
+            score: 8.6,
+            credits: 3,
+            semester: '2',
+          ),
+        ],
+      ),
     ];
   }
 
@@ -106,7 +363,11 @@ class StudentProvider with ChangeNotifier {
   List<Student> get students {
     Iterable<Student> filtered = _students;
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((s) => s.name.toLowerCase().contains(_searchQuery.toLowerCase()) || s.mssv.contains(_searchQuery));
+      filtered = filtered.where(
+        (s) =>
+            s.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            s.mssv.contains(_searchQuery),
+      );
     }
     if (_selectedDepartmentId != null) {
       filtered = filtered.where((s) {
@@ -114,7 +375,9 @@ class StudentProvider with ChangeNotifier {
           final classInfo = _classes.firstWhere((c) => c.id == s.classId);
           final major = _majors.firstWhere((m) => m.id == classInfo.majorId);
           return major.departmentId == _selectedDepartmentId;
-        } catch (e) { return false; }
+        } catch (e) {
+          return false;
+        }
       });
     }
     return filtered.toList();
@@ -129,7 +392,9 @@ class StudentProvider with ChangeNotifier {
     try {
       final classInfo = _classes.firstWhere((c) => c.id == classId);
       return _majors.firstWhere((m) => m.id == classInfo.majorId).name;
-    } catch (e) { return 'Unknown'; }
+    } catch (e) {
+      return 'Unknown';
+    }
   }
 
   String getDepartmentName(String classId) {
@@ -137,11 +402,17 @@ class StudentProvider with ChangeNotifier {
       final classInfo = _classes.firstWhere((c) => c.id == classId);
       final major = _majors.firstWhere((m) => m.id == classInfo.majorId);
       return _departments.firstWhere((d) => d.id == major.departmentId).name;
-    } catch (e) { return 'Unknown'; }
+    } catch (e) {
+      return 'Unknown';
+    }
   }
 
   String getClassName(String classId) {
-    try { return _classes.firstWhere((c) => c.id == classId).name; } catch (e) { return 'Unknown'; }
+    try {
+      return _classes.firstWhere((c) => c.id == classId).name;
+    } catch (e) {
+      return 'Unknown';
+    }
   }
 
   int get totalStudents => _students.length;

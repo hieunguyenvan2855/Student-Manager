@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../providers/student_provider.dart';
 import '../models/student.dart';
+import 'student_detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -177,6 +178,13 @@ class HomeScreen extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => StudentDetailScreen(student: student),
+            ),
+          );
+        },
         contentPadding: const EdgeInsets.all(12),
         leading: CircleAvatar(
           radius: 25,

@@ -48,16 +48,30 @@ class Student {
     return double.parse((total / grades.length).toStringAsFixed(2));
   }
 
+  // GPA 4.0 theo công thức có tính tín chỉ
   double get gpa4 {
-    double g10 = gpa10;
-    if (g10 >= 8.5) return 4.0;
-    if (g10 >= 8.0) return 3.5;
-    if (g10 >= 7.0) return 3.0;
-    if (g10 >= 6.5) return 2.5;
-    if (g10 >= 5.5) return 2.0;
-    if (g10 >= 5.0) return 1.5;
-    if (g10 >= 4.0) return 1.0;
-    return 0.0;
+    if (grades.isEmpty) return 0.0;
+    double totalWeighted = grades.fold(
+      0.0,
+      (sum, item) => sum + item.weightedScore,
+    );
+    int totalCredits = grades.fold(0, (sum, item) => sum + item.credits);
+    if (totalCredits == 0) return 0.0;
+    double result = totalWeighted / totalCredits;
+    return double.parse(result.toStringAsFixed(2));
+  }
+
+  // GPA 10 dựa trên average score
+  double get gpa10Weighted {
+    if (grades.isEmpty) return 0.0;
+    double totalScore = grades.fold(
+      0.0,
+      (sum, item) => sum + (item.score * item.credits),
+    );
+    int totalCredits = grades.fold(0, (sum, item) => sum + item.credits);
+    if (totalCredits == 0) return 0.0;
+    double result = totalScore / totalCredits;
+    return double.parse(result.toStringAsFixed(2));
   }
 
   String get classification {
@@ -67,5 +81,39 @@ class Student {
     if (g4 >= 2.5) return 'Khá';
     if (g4 >= 2.0) return 'Trung bình';
     return 'Yếu/Kém';
+  }
+
+  // Lấy điểm theo kì học
+  Map<String, List<Grade>> get gradesBysemester {
+    Map<String, List<Grade>> result = {};
+    for (var grade in grades) {
+      if (!result.containsKey(grade.semester)) {
+        result[grade.semester] = [];
+      }
+      result[grade.semester]!.add(grade);
+    }
+    return result;
+  }
+
+  // GPA theo từng kì
+  Map<String, double> get gpaBySemester {
+    Map<String, double> result = {};
+    gradesBysemester.forEach((semester, gradesList) {
+      if (gradesList.isEmpty) {
+        result[semester] = 0.0;
+      } else {
+        double totalWeighted = gradesList.fold(
+          0.0,
+          (sum, item) => sum + item.weightedScore,
+        );
+        int totalCredits = gradesList.fold(
+          0,
+          (sum, item) => sum + item.credits,
+        );
+        double gpa = totalCredits == 0 ? 0.0 : totalWeighted / totalCredits;
+        result[semester] = double.parse(gpa.toStringAsFixed(2));
+      }
+    });
+    return result;
   }
 }

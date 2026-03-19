@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../models/student.dart';
 import '../providers/student_provider.dart';
+import 'academic_screen.dart';
 
 class StudentDetailScreen extends StatelessWidget {
   final Student student;
@@ -13,7 +13,7 @@ class StudentDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.read<StudentProvider>();
-    
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -46,9 +46,21 @@ class StudentDetailScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(student.name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                            Text(
+                              student.name,
+                              style: const TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Text('MSSV: ${student.mssv}', style: TextStyle(fontSize: 16, color: Colors.grey[600])),
+                            Text(
+                              'MSSV: ${student.mssv}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -56,26 +68,73 @@ class StudentDetailScreen extends StatelessWidget {
                     ],
                   ),
                   const Divider(height: 40),
-                  
+
                   // Thông tin cơ bản
                   _buildSectionTitle('Thông tin cơ bản'),
                   const SizedBox(height: 16),
-                  _buildInfoRow(Icons.school, 'Khoa', provider.getDepartmentName(student.classId)),
-                  _buildInfoRow(Icons.book, 'Ngành', provider.getMajorName(student.classId)),
-                  _buildInfoRow(Icons.group, 'Lớp học', provider.getClassName(student.classId)),
-                  _buildInfoRow(Icons.location_on, 'Quê quán', student.hometown),
-                  _buildInfoRow(Icons.phone, 'Số điện thoại', student.phoneNumber),
+                  _buildInfoRow(
+                    Icons.school,
+                    'Khoa',
+                    provider.getDepartmentName(student.classId),
+                  ),
+                  _buildInfoRow(
+                    Icons.book,
+                    'Ngành',
+                    provider.getMajorName(student.classId),
+                  ),
+                  _buildInfoRow(
+                    Icons.group,
+                    'Lớp học',
+                    provider.getClassName(student.classId),
+                  ),
+                  _buildInfoRow(
+                    Icons.location_on,
+                    'Quê quán',
+                    student.hometown,
+                  ),
+                  _buildInfoRow(
+                    Icons.phone,
+                    'Số điện thoại',
+                    student.phoneNumber,
+                  ),
 
                   const Divider(height: 40),
 
-                  // Bảng điểm (Thành viên C sẽ phát triển thêm biểu đồ ở đây)
-                  _buildSectionTitle('Bảng điểm chi tiết'),
+                  // Bảng điểm - Nút dẫn đến Academic Screen
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildSectionTitle('Bảng điểm chi tiết'),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  AcademicScreen(student: student),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.bar_chart, size: 18),
+                        label: const Text('Chi tiết'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.indigo,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   if (student.grades.isEmpty)
                     const Text('Chưa có dữ liệu điểm môn học.')
                   else
-                    ...student.grades.map((g) => _buildGradeItem(g.subjectId, g.score)),
-                  
+                    ...student.grades
+                        .take(3)
+                        .map((g) => _buildGradeItem(g.subjectName, g.score)),
+
                   const SizedBox(height: 100),
                 ],
               ),
@@ -86,7 +145,10 @@ class StudentDetailScreen extends StatelessWidget {
       // Action Buttons
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {},
-        label: const Text('Chỉnh sửa hồ sơ', style: TextStyle(color: Colors.white)),
+        label: const Text(
+          'Chỉnh sửa hồ sơ',
+          style: TextStyle(color: Colors.white),
+        ),
         icon: const Icon(Icons.edit, color: Colors.white),
         backgroundColor: Colors.indigo,
       ),
@@ -102,15 +164,32 @@ class StudentDetailScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Text('GPA 4.0', style: TextStyle(color: Colors.white70, fontSize: 10)),
-          Text(gpa.toString(), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+          const Text(
+            'GPA 4.0',
+            style: TextStyle(color: Colors.white70, fontSize: 10),
+          ),
+          Text(
+            gpa.toString(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildSectionTitle(String title) {
-    return Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.indigo));
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+        color: Colors.indigo,
+      ),
+    );
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
@@ -120,15 +199,27 @@ class StudentDetailScreen extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: Colors.indigo.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(
+              color: Colors.indigo.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Icon(icon, size: 20, color: Colors.indigo),
           ),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-              Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Text(
+                label,
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ],
@@ -149,7 +240,13 @@ class StudentDetailScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(subject, style: const TextStyle(fontWeight: FontWeight.w500)),
-          Text(score.toString(), style: TextStyle(fontWeight: FontWeight.bold, color: score >= 5 ? Colors.green : Colors.red)),
+          Text(
+            score.toString(),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: score >= 5 ? Colors.green : Colors.red,
+            ),
+          ),
         ],
       ),
     );
