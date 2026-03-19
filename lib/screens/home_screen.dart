@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../providers/student_provider.dart';
 import '../models/student.dart';
+import 'student_detail_screen.dart';
+import 'add_student_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -148,7 +150,12 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AddStudentScreen()),
+              );
+            },
             label: const Text('Thêm SV', style: TextStyle(color: Colors.white)),
             icon: const Icon(Icons.add, color: Colors.white),
             backgroundColor: Colors.indigo,
@@ -176,26 +183,47 @@ class HomeScreen extends StatelessWidget {
   Widget _buildModernStudentCard(BuildContext context, Student student, StudentProvider provider) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        leading: CircleAvatar(
-          radius: 25,
-          backgroundImage: CachedNetworkImageProvider(student.avatarUrl),
-        ),
-        title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('MSSV: ${student.mssv}', style: const TextStyle(fontSize: 11)),
-            Text(provider.getMajorName(student.classId), style: const TextStyle(fontSize: 11, color: Colors.indigo, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(student.gpa4.toString(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
-            Text(student.classification, style: const TextStyle(fontSize: 8, color: Colors.grey)),
-          ],
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => StudentDetailScreen(student: student),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Hero(
+                tag: 'avatar-${student.id}',
+                child: CircleAvatar(
+                  radius: 25,
+                  backgroundImage: CachedNetworkImageProvider(student.avatarUrl),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text('MSSV: ${student.mssv}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                    Text(provider.getMajorName(student.classId), style: const TextStyle(fontSize: 11, color: Colors.indigo, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(student.gpa4.toString(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue)),
+                  Text(student.classification, style: const TextStyle(fontSize: 8, color: Colors.grey)),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

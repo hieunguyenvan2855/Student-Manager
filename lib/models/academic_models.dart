@@ -57,13 +57,15 @@ class Subject {
 class Grade {
   final String subjectId;
   final double score;
+  final int credits;
 
-  Grade({required this.subjectId, required this.score});
+  Grade({required this.subjectId, required this.score, this.credits = 3});
 
   factory Grade.fromMap(Map<String, dynamic> map) {
     return Grade(
       subjectId: map['subjectId'],
       score: map['score'],
+      credits: map['credits'] ?? 3,
     );
   }
 }

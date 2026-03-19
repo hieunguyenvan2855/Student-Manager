@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb; // Để nhận diện chạy trên Web hay Mobile
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../models/student.dart';
 import '../models/academic_models.dart';
 import '../database/database_helper.dart';
@@ -25,10 +25,8 @@ class StudentProvider with ChangeNotifier {
     notifyListeners();
 
     if (kIsWeb) {
-      // CHẾ ĐỘ CHROME: Nạp dữ liệu mẫu trực tiếp vào bộ nhớ
-      _loadMockDataForWeb();
+      _loadMockData();
     } else {
-      // CHẾ ĐỘ ĐIỆN THOẠI: Dùng SQLite
       try {
         final db = await DatabaseHelper.instance.database;
         
@@ -49,9 +47,10 @@ class StudentProvider with ChangeNotifier {
           loadedStudents.add(Student.fromMap(sMap, grades));
         }
         _students = loadedStudents;
+        
+        if (_students.isEmpty) _loadMockData();
       } catch (e) {
-        debugPrint("SQLite Error, falling back to Mock Data: $e");
-        _loadMockDataForWeb();
+        _loadMockData();
       }
     }
 
@@ -59,23 +58,17 @@ class StudentProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void _loadMockDataForWeb() {
-    // Tái hiện bộ dữ liệu "khủng" cho các bạn chạy Web
+  void _loadMockData() {
     _departments = [
       Department(id: 'd1', name: 'CNTT', icon: 'laptop'),
       Department(id: 'd2', name: 'Kinh tế', icon: 'chart-line'),
       Department(id: 'd3', name: 'Ngôn ngữ', icon: 'language'),
-      Department(id: 'd4', name: 'Ô tô', icon: 'car'),
-      Department(id: 'd5', name: 'Du lịch', icon: 'hotel'),
-      Department(id: 'd6', name: 'Điện tử', icon: 'bolt'),
-      Department(id: 'd7', name: 'Đồ họa', icon: 'palette'),
     ];
 
     _majors = [
       Major(id: 'm1', name: 'Kỹ thuật phần mềm', departmentId: 'd1'),
       Major(id: 'm2', name: 'Marketing', departmentId: 'd2'),
       Major(id: 'm3', name: 'Ngôn ngữ Anh', departmentId: 'd3'),
-      Major(id: 'm4', name: 'Quản trị khách sạn', departmentId: 'd5'),
     ];
 
     _classes = [
@@ -85,17 +78,59 @@ class StudentProvider with ChangeNotifier {
     ];
 
     _students = [
-      Student(id: '1', mssv: 'SV001', name: 'Nguyễn Văn Hiếu', classId: 'c1', hometown: 'Hà Nội', avatarUrl: 'https://i.pravatar.cc/150?u=1', phoneNumber: '091', status: StudentStatus.studying, grades: [Grade(subjectId: 'Flutter', score: 9.5)]),
-      Student(id: '2', mssv: 'SV002', name: 'Lê Thị Mai', classId: 'c1', hometown: 'Đà Nẵng', avatarUrl: 'https://i.pravatar.cc/150?u=2', phoneNumber: '092', status: StudentStatus.studying, grades: [Grade(subjectId: 'Flutter', score: 8.0)]),
-      Student(id: '3', mssv: 'SV003', name: 'Trần Minh Quân', classId: 'c2', hometown: 'HCM', avatarUrl: 'https://i.pravatar.cc/150?u=3', phoneNumber: '093', status: StudentStatus.studying, grades: [Grade(subjectId: 'Marketing', score: 9.0)]),
-      Student(id: '4', mssv: 'SV004', name: 'Phạm Hoàng Long', classId: 'c2', hometown: 'Hải Phòng', avatarUrl: 'https://i.pravatar.cc/150?u=4', phoneNumber: '094', status: StudentStatus.studying, grades: [Grade(subjectId: 'Marketing', score: 7.5)]),
-      Student(id: '5', mssv: 'SV005', name: 'Vũ Thanh Thảo', classId: 'c3', hometown: 'Cần Thơ', avatarUrl: 'https://i.pravatar.cc/150?u=5', phoneNumber: '095', status: StudentStatus.studying, grades: [Grade(subjectId: 'English', score: 8.5)]),
-      // Thêm tiếp cho đủ 20 SV...
+      Student(
+        id: '1', 
+        mssv: 'SV001', 
+        name: 'Nguyễn Văn Hiếu', 
+        classId: 'c1', 
+        hometown: 'Hà Nội', 
+        birthday: '15/05/2003',
+        email: 'hieu.nv@gmail.com',
+        avatarUrl: 'https://i.pravatar.cc/150?u=1', 
+        phoneNumber: '0912345678', 
+        status: StudentStatus.studying, 
+        grades: [
+          Grade(subjectId: 'Flutter', score: 9.5, credits: 3),
+          Grade(subjectId: 'Java', score: 8.0, credits: 4),
+          Grade(subjectId: 'SQL', score: 8.5, credits: 2),
+          Grade(subjectId: 'Web', score: 7.0, credits: 3),
+        ]
+      ),
+      Student(
+        id: '2', 
+        mssv: 'SV002', 
+        name: 'Lê Thị Mai', 
+        classId: 'c1', 
+        hometown: 'Đà Nẵng', 
+        birthday: '20/10/2003',
+        email: 'mai.lt@gmail.com',
+        avatarUrl: 'https://i.pravatar.cc/150?u=2', 
+        phoneNumber: '0923456789', 
+        status: StudentStatus.studying, 
+        grades: [
+          Grade(subjectId: 'Flutter', score: 8.0, credits: 3),
+          Grade(subjectId: 'Java', score: 9.0, credits: 4),
+          Grade(subjectId: 'SQL', score: 7.5, credits: 2),
+        ]
+      ),
     ];
   }
 
-  // Các hàm Filter giữ nguyên
+  void updateStudent(Student updatedStudent) {
+    final index = _students.indexWhere((s) => s.id == updatedStudent.id);
+    if (index != -1) {
+      _students[index] = updatedStudent;
+      notifyListeners();
+    }
+  }
+
+  void addStudent(Student student) {
+    _students.add(student);
+    notifyListeners();
+  }
+
   List<Department> get departments => _departments;
+  List<ClassInfo> get classes => _classes;
   String? get selectedDepartmentId => _selectedDepartmentId;
 
   void selectDepartment(String? id) {

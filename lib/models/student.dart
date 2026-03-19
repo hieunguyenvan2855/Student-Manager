@@ -10,6 +10,8 @@ class Student {
   final String hometown;
   final String avatarUrl;
   final String phoneNumber;
+  final String email;
+  final String birthday;
   final List<Grade> grades;
   final StudentStatus status;
 
@@ -21,6 +23,8 @@ class Student {
     required this.hometown,
     required this.avatarUrl,
     required this.phoneNumber,
+    required this.email,
+    required this.birthday,
     required this.grades,
     required this.status,
   });
@@ -34,6 +38,8 @@ class Student {
       hometown: map['hometown'],
       avatarUrl: map['avatarUrl'],
       phoneNumber: map['phoneNumber'],
+      email: map['email'] ?? '',
+      birthday: map['birthday'] ?? '01/01/2000',
       status: StudentStatus.values.firstWhere(
         (e) => e.toString() == 'StudentStatus.${map['status']}',
         orElse: () => StudentStatus.studying,
@@ -44,8 +50,10 @@ class Student {
 
   double get gpa10 {
     if (grades.isEmpty) return 0.0;
-    double total = grades.fold(0, (sum, item) => sum + item.score);
-    return double.parse((total / grades.length).toStringAsFixed(2));
+    double totalWeightedScore = grades.fold(0, (sum, item) => sum + (item.score * item.credits));
+    int totalCredits = grades.fold(0, (sum, item) => sum + item.credits);
+    if (totalCredits == 0) return 0.0;
+    return double.parse((totalWeightedScore / totalCredits).toStringAsFixed(2));
   }
 
   double get gpa4 {
@@ -66,6 +74,30 @@ class Student {
     if (g4 >= 3.2) return 'Giỏi';
     if (g4 >= 2.5) return 'Khá';
     if (g4 >= 2.0) return 'Trung bình';
-    return 'Yếu/Kém';
+    return 'Yêu/Kém';
+  }
+
+  Student copyWith({
+    String? name,
+    String? mssv,
+    String? phoneNumber,
+    String? email,
+    String? hometown,
+    String? birthday,
+    List<Grade>? grades,
+  }) {
+    return Student(
+      id: id,
+      mssv: mssv ?? this.mssv,
+      name: name ?? this.name,
+      classId: classId,
+      hometown: hometown ?? this.hometown,
+      avatarUrl: avatarUrl,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      email: email ?? this.email,
+      birthday: birthday ?? this.birthday,
+      grades: grades ?? this.grades,
+      status: status,
+    );
   }
 }
