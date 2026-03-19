@@ -45,6 +45,10 @@ class _AcademicScreenState extends State<AcademicScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Bảng Điểm & Thống Kê'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
+          ),
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.list), text: 'Điểm môn học'),
@@ -221,7 +225,41 @@ class _AcademicScreenState extends State<AcademicScreen> {
       itemCount: grades.length,
       itemBuilder: (context, index) {
         final grade = grades[index];
-        return _buildGradeCard(grade);
+        return Dismissible(
+          key: ValueKey('${grade.subjectName}-${grade.semester}-$index'),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            color: Colors.red,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.delete, color: Colors.white),
+                const SizedBox(height: 4),
+                Text(
+                  grade.subjectName.length > 12
+                      ? '${grade.subjectName.substring(0, 12)}...'
+                      : grade.subjectName,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          confirmDismiss: (direction) async {
+            return await _showDeleteConfirmationDialog(grade);
+          },
+          onDismissed: (direction) {
+            _deleteGrade(index);
+          },
+          child: _buildGradeCard(grade),
+        );
       },
     );
   }
@@ -539,6 +577,56 @@ class _AcademicScreenState extends State<AcademicScreen> {
     if (score >= 7.0) return Colors.blue;
     if (score >= 6.0) return Colors.amber;
     return Colors.red;
+  }
+
+  Future<bool> _showDeleteConfirmationDialog(dynamic grade) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Xác nhận xóa'),
+              content: Text(
+                'Bạn có chắc chắn muốn xóa điểm môn "${grade.subjectName}"?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Hủy'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
+                  child: const Text('Xóa'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  void _deleteGrade(int index) {
+    final grades = _filteredGrades;
+    if (index < 0 || index >= grades.length) return;
+
+    final deletedGrade = grades[index];
+    setState(() {
+      _student.grades.removeWhere((g) => g == deletedGrade);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Đã xóa điểm môn "${deletedGrade.subjectName}"'),
+        duration: const Duration(seconds: 2),
+        action: SnackBarAction(
+          label: 'Hoàn tác',
+          onPressed: () {
+            setState(() {
+              _student.grades.add(deletedGrade);
+            });
+          },
+        ),
+      ),
+    );
   }
 
   // ============ TAB 3: THỐNG KÊ ============
